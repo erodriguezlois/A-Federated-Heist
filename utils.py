@@ -247,7 +247,7 @@ def plot_bn_distributions(model):
     )
     plt.xlim(-0.5, 1.5)
     plt.ylim(0, 10)
-    plt.xlabel('Scaling Value ($\gamma$)', fontsize=12)
+    plt.xlabel(r'Scaling Value ($\gamma$)', fontsize=12)
     plt.ylabel('Density', fontsize=12)
     plt.axvline(x=0, color='k', linestyle='--', alpha=0.5, linewidth=1.5, label='Zero')
     plt.axvline(x=1, color='k', linestyle='-', alpha=0.5, linewidth=1.5, label='Unity (Initialization)')
