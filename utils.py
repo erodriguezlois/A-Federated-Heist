@@ -179,6 +179,7 @@ def load_model():
     return model
 
 def oracle(model):
+    print("Evaluating suspicious model...")
     model.eval()
     model.to(args.device)
     extracting_matrices = np.load("./oracle/extracting_matrices_ResNet18_D4S.npy", allow_pickle=True)
@@ -189,12 +190,16 @@ def oracle(model):
     correct = 0
     total = 0
     with torch.no_grad():
+        batches_n = 0
         for images, labels in test_loader:
             images, labels = images.to(args.device), labels.to(args.device)
             outputs = model(images)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
+            batches_n += 1
+            if batches_n > 10:
+              break
     acc = correct / total
     min_ber = 100000
     min_idx = 0
