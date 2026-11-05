@@ -185,7 +185,7 @@ def oracle(model):
     local_fingerprints = np.load("./oracle/local_fingerprints_ResNet18_D4S.npy", allow_pickle=True)    
     embed_layers = get_embed_layers(model, args.embed_layer_names)
     test_dataset = get_full_dataset(args.dataset)[1]
-    test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=4)
+    test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
     correct = 0
     total = 0
     with torch.no_grad():
