@@ -310,3 +310,67 @@ def compare_models(model1, model2):
         if not torch.equal(param1, param2):
             print("Models differ at layer:", name)
     return
+
+def run_example_classes(model):
+    classes = ['airplane', 'automobile', 'bird', 'cat', 'deer', 
+               'dog', 'frog', 'horse', 'ship', 'truck']
+    
+    # Get the test dataset
+    _, test_dataset = get_full_dataset(args.dataset)
+    
+    # Dictionary to keep track of found classes
+    found_samples = {}
+    
+    # Search through dataset to grab one sample per class
+    for img, label in test_dataset:
+        if label not in found_samples:
+            found_samples[label] = img
+        if len(found_samples) == len(classes):
+            break
+            
+    # Sort samples by class index (0 to 9)
+    sorted_samples = [found_samples[i] for i in range(len(classes))]
+    batch_tensor = torch.stack(sorted_samples).to(args.device)
+    
+    # Run model inference
+    model.eval()
+    model.to(args.device)
+    with torch.no_grad():
+        outputs = model(batch_tensor)
+        _, predicted = torch.max(outputs, 1)
+        
+    predicted = predicted.cpu().numpy()
+    
+    # Plotting setup
+    fig, axes = plt.subplots(2, 5, figsize=(15, 7))
+    axes = axes.flatten()
+    
+    # CIFAR-10 normalization stats for un-normalizing display images
+    mean = np.array([0.491, 0.482, 0.447])
+    std = np.array([0.247, 0.244, 0.262])
+    
+    for i in range(len(classes)):
+        # Un-normalize image tensor for plotting
+        img_np = sorted_samples[i].permute(1, 2, 0).numpy()
+        img_np = std * img_np + mean
+        img_np = np.clip(img_np, 0, 1)
+        
+        true_name = classes[i]
+        pred_idx = predicted[i]
+        pred_name = classes[pred_idx]
+        
+        is_correct = (pred_idx == i)
+        color = 'green' if is_correct else 'red'
+        
+        axes[i].imshow(img_np)
+        axes[i].axis('off')
+        
+        # Natural language text output on the plot
+        title_text = f"Prediction: {pred_name}"
+        axes[i].set_title(title_text, color=color, fontsize=12, fontweight='bold')
+        
+    plt.suptitle("Model Performance Samples", fontsize=15, fontweight='bold', y=1.02)
+    plt.tight_layout()
+    plt.show()
+    model.to("cpu")
+    return
