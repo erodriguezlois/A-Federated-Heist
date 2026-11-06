@@ -305,10 +305,14 @@ def load_participant_model(id):
     return model
 
 def compare_models(model1, model2):
+    all_equal = True
     for name, param1 in model1.named_parameters():
         param2 = dict(model2.named_parameters())[name]
         if not torch.equal(param1, param2):
+            all_equal = False
             print("Models differ at layer:", name)
+    if all_equal:
+        print("Models are identical.")
     return
 
 def run_example_classes(model):
